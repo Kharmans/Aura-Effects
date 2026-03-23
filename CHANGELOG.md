@@ -1,5 +1,8 @@
 # Aura Effects Changelog
 
+## Version 1.4.1
+- Translation updates (thanks Kharmans!)
+
 ## Version 1.4.0
 - Added a setting so that, in instances of a tie between non-stacking auras, the "new" aura wins (by default, the existing effect wins)
 - Fixed a dnd5e-specific bug where auras didn't play nicely when transforming
