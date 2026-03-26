@@ -47,6 +47,14 @@ export function registerSettings() {
     type: String,
     default: "0.0.0"
   });
+  game.settings.register("auraeffects", "seenSystemWarning", {
+    name: "Seen System Warning",
+    hint: "Tracks whether a warning about potential system incompatibility has been given. Please do not touch this.",
+    scope: "world",
+    config: false,
+    type: Boolean,
+    default: false
+  });
   game.settings.register("auraeffects", "defaultVisibility", {
     name: "AURAEFFECTS.SETTINGS.DefaultVisibility.Name",
     hint: "AURAEFFECTS.SETTINGS.DefaultVisibility.Hint",

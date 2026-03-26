@@ -82,6 +82,7 @@
             "Beginning": "Beginning Aura Effects migrations..."
         },
         "NoActiveGM": "Aura Effects will not attempt to function without a GM logged in.",
+        "PotentialSystemIncompatibility": "Please note that, because this system's base Active Effect definition overlaps with the fields Aura Effects adds, any Aura-type effects will not have whatever system-specific enhancements exist on normal effects.",
         "SETTINGS": {
             "DefaultVisibility": {
                 "Hint": "When enabled, visualization will be on by default for any newly-created aura effects.",

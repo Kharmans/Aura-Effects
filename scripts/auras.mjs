@@ -1,4 +1,4 @@
-import AuraActiveEffectData from "./AuraActiveEffectData.mjs";
+import AuraActiveEffectDataMixin from "./AuraActiveEffectData.mjs";
 import AuraActiveEffectSheetMixin from "./AuraActiveEffectSheet.mjs";
 import { executeScript, getAllAuraEffects, getChangingSceneAuras, getNearbyTokens, isFinalMovementComplete, removeAndReplaceAuras } from "./helpers.mjs";
 import { applyAuraEffects, deleteEffects } from "./queries.mjs";
@@ -13,6 +13,9 @@ import { registerDnd5eHooks } from "./systems/dnd5e.mjs";
 
 // Track whether the "with no GM this no work" warning has been seen
 let seenWarning = false;
+
+// Track whether to mix the base effect type
+let mixBase = true;
 
 /**
  * Provided the arguments for the createActiveEffect or deleteActiveEffect hooks, check whether any updates should
@@ -375,7 +378,9 @@ function injectAuraButton(app, html) {
     if (foundry.utils.getType(updates.changes) !== "Array") updates.changes = Object.values(updates.changes ?? {});
     updates.type = "auraeffects.aura";
     foundry.utils.setProperty(updates, "flags.auraeffects.originalType", currType);
+    const currSystem = app.document.toObject().system;
     updates["==system"] = {
+      ...currSystem,
       showRadius: game.settings.get("auraeffects", "defaultVisibility")
     };
     return app.document.update(updates);
@@ -418,14 +423,21 @@ function registerQueries() {
 }
 
 function registerAuraType() {
+  const baseClass = CONFIG.ActiveEffect.dataModels.base ?? foundry.abstract.TypeDataModel;
+  try {
+    const origSchemaKeys = Object.keys(baseClass.defineSchema()); // Throws if TypeDataModel
+    const auraSchemaKeys = Object.keys(AuraActiveEffectDataMixin(foundry.abstract.TypeDataModel).defineSchema());
+    mixBase = !auraSchemaKeys.some(k => origSchemaKeys.includes(k));
+  } catch (err) {}
   Object.assign(CONFIG.ActiveEffect.dataModels, {
-    "auraeffects.aura": AuraActiveEffectData
+    "auraeffects.aura": AuraActiveEffectDataMixin(mixBase ? baseClass : foundry.abstract.TypeDataModel)
   });
 }
 
 function registerAuraSheet() {
   const defaultAESheet = Object.values(CONFIG.ActiveEffect.sheetClasses.base).find(d => d.default)?.cls;
-  const AuraActiveEffectSheet = AuraActiveEffectSheetMixin(defaultAESheet ?? foundry.applications.sheets.ActiveEffectConfig);
+  const sheetToMix = (mixBase && defaultAESheet) ? defaultAESheet : foundry.applications.sheets.ActiveEffectConfig;
+  const AuraActiveEffectSheet = AuraActiveEffectSheetMixin(sheetToMix);
   foundry.applications.apps.DocumentSheetConfig.registerSheet(ActiveEffect, "auraeffects", AuraActiveEffectSheet, {
     label: "AURAEFFECTS.SHEETS.AuraActiveEffectSheet",
     types: ["auraeffects.aura"],
@@ -444,5 +456,17 @@ Hooks.once("init", () => {
 Hooks.once("ready", () => {
   registerAuraSheet();
   game.modules.get("auraeffects").api = api;
-  if (game.user.isActiveGM) migrate();
+  if (game.user.isActiveGM) {
+    if (!mixBase && !game.settings.get("auraeffects", "seenSystemWarning")) {
+      ChatMessage.implementation.create({
+        speaker: {
+          alias: "Aura Effects"
+        },
+        whisper: [game.user],
+        content: game.i18n.localize("AURAEFFECTS.PotentialSystemIncompatibility")
+      });
+      game.settings.set("auraeffects", "seenSystemWarning", true);
+    }
+    migrate();
+  }
 });

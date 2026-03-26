@@ -19,7 +19,7 @@ const migrations = {
   "1.0.0": {
     alert: false,
     migrateFunction: async () => {
-      ChatMessage.create({
+      ChatMessage.implementation.create({
         speaker: {
           alias: "Aura Effects"
         },
