@@ -139,7 +139,7 @@ async function deleteToken(token, options, userId) {
   const auraSourceUuids = activeSourceEffects.map(e => e.uuid);
   const toRemoveAppliedEffects = canvas.scene.tokens
     .filter(t => t.actor && (t.actor !== actor))
-    .flatMap(t => t.actor.appliedEffects)
+    .flatMap(t => t.actor.effects.contents)
     .filter(e => e.flags?.auraeffects?.fromAura && auraSourceUuids.includes(e.origin));
   await removeAndReplaceAuras(toRemoveAppliedEffects, canvas.scene);
 }
@@ -171,7 +171,7 @@ async function updateToken(token, updates, options, userId) {
     const toRemoveSourceEffects = inactiveSourceEffects.filter(e => e.system.disableOnHidden);
     const toRemoveAppliedEffects = canvas.scene.tokens
       .filter(t => t.actor && (t !== token))
-      .flatMap(t => t.actor.appliedEffects)
+      .flatMap(t => t.actor.effects.contents)
       .filter(e => e.flags?.auraeffects?.fromAura && toRemoveSourceEffects.some(sourceEff => e.origin === sourceEff.uuid));
     if (toRemoveAppliedEffects.length) await removeAndReplaceAuras(toRemoveAppliedEffects, token.parent);
   }
@@ -248,7 +248,7 @@ async function moveToken(token, movement, operation, user) {
     const toDelete = Array.from(preMoveRange.difference(postMoveRange)).map(a => a.effects.find(e => e.origin === effect.uuid));
 
     // Grab any lingering effects from now-inactive auras, too
-    const additionalDeletion = token.parent.tokens.map(t => t.actor?.appliedEffects.filter(e => inactiveUuids.includes(e.origin)) ?? []).flat();
+    const additionalDeletion = token.parent.tokens.map(t => t.actor?.effects.filter(e => inactiveUuids.includes(e.origin)) ?? []).flat();
 
     await removeAndReplaceAuras(toDelete.concat(additionalDeletion).filter(e => e), token.parent);
 
@@ -300,7 +300,7 @@ async function updateActiveEffect(effect, updates, options, userId) {
   // Since this change either disabled the effect or modified its parameters, get all currently-applied effects
   let toRemoveAppliedEffects = canvas.scene.tokens
     .filter(t => t.actor && (t.actor !== actor))
-    .flatMap(t => t.actor.appliedEffects)
+    .flatMap(t => t.actor.effects.contents)
     .filter(e => e.flags?.auraeffects?.fromAura && e.origin === effect.uuid);
 
   if (!updates.disabled) {
@@ -344,7 +344,7 @@ async function deleteActiveEffect(effect, options, userId) {
   }
   const toRemoveAppliedEffects = canvas.scene.tokens
     .filter(t => t.actor && (t.actor !== actor))
-    .flatMap(t => t.actor.appliedEffects)
+    .flatMap(t => t.actor.effects.contents)
     .filter(e => e.flags?.auraeffects?.fromAura && e.origin === effect.uuid);
   await removeAndReplaceAuras(toRemoveAppliedEffects, canvas.scene);
 }

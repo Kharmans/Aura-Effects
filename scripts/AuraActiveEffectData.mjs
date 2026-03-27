@@ -103,7 +103,7 @@ export default function AuraActiveEffectDataMixin(ActiveEffectClass) {
       }
       if (!this.canStack) {
         const nameMatch = this.overrideName || this.parent.name;
-        const existing = actor?.appliedEffects.find(e => e.flags?.auraeffects?.fromAura && e.name === nameMatch);
+        const existing = actor?.effects.find(e => e.flags?.auraeffects?.fromAura && e.name === nameMatch);
         if (existing) {
           this.stashedChanges = this.parent.changes;
           this.stashedStatuses = this.parent.statuses;

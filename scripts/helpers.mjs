@@ -158,7 +158,7 @@ function getAllAuraEffects(actor) {
  * @returns {[ActiveEffect[], ActiveEffect[]]}  The Arrays of aura effects (to remove, then to add)
  */
 function getChangingSceneAuras(token, origin={}) {
-  const currentAppliedAuras = token.actor.appliedEffects.filter(i => i.flags?.auraeffects?.fromAura);
+  const currentAppliedAuras = token.actor.effects.filter(i => i.flags?.auraeffects?.fromAura);
   // Get all aura source effects on the scene, split into "actor shouldn't have" and "actor should have"
   const [sceneAurasToRemove, sceneAurasToAdd] = token.parent.tokens.reduce(([toRemove, toAdd], sourceToken) => {
     if (sourceToken.actor === token.actor) return [toRemove, toAdd];
@@ -192,7 +192,7 @@ function getChangingSceneAuras(token, origin={}) {
     return [toRemove, toAdd]
   }, [[], []]);
 
-  for (const effect of token.actor.appliedEffects) {
+  for (const effect of token.actor.effects) {
     if (!effect.flags?.auraeffects?.fromAura) continue;
     const sourceEffect = fromUuidSync(effect.origin);
     if (!sourceEffect || sourceEffect.disabled || sourceEffect.isSuppressed) sceneAurasToRemove.push(effect);

@@ -1,5 +1,9 @@
 # Aura Effects Changelog
 
+## Version 1.5.1
+- Fixed effects only being removed from actors if they were not disabled and not suppressed
+- Translation updates (thanks GregoryWarn!)
+
 ## Version 1.5.0
 - Added compatibility for systems which extend the `base` AE data model. In most such systems, this will mean Aura effects will behave just as normal effects do (getting all the special fields etc added), but additionally will have Aura functionality. For some systems, this will mean treating Aura effects as "just" completely vanilla active effects, but with Aura functionality.
 

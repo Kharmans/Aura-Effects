@@ -27,7 +27,7 @@ async function applyAuraEffects(actorToEffectsMap) {
   await gmQueue.add(() => {
     return Promise.all(Object.entries(actorToEffectsMap).map(([actorUuid, effectUuids]) => {
       const actor = fromUuidSync(actorUuid);
-      const allEffects = actor.appliedEffects;
+      const allEffects = actor.effects;
       const effectsToDelete = [];
       const effects = effectUuids.map(uuid => {
         if (allEffects.some(e => e.origin === uuid)) return null;
