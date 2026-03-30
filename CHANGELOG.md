@@ -1,5 +1,8 @@
 # Aura Effects Changelog
 
+## Version 1.5.2
+- Translation updates (thanks Kharmans!)
+
 ## Version 1.5.1
 - Fixed effects only being removed from actors if they were not disabled and not suppressed
 - Translation updates (thanks GregoryWarn!)
